@@ -14,18 +14,27 @@ impl ListNode {
     }
 }
 
-pub fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    head.map(|mut ln|{
-        let mut current = ln.as_mut();
-        while let Some(next) = current.next.as_mut(){
-            if current.val == next.val {
-                current.next = next.next.take()
-            }else {
-                current = current.next.as_mut().unwrap();
+pub fn delete_duplicates(head: Option<Box<ListNode>>)-> Option<Box<ListNode>>{
+    fn go(node: Option<Box<ListNode>>, prev: Option<i32>) -> Option<Box<ListNode>> {
+        if let Some(mut n) = node {
+            let x = Some(n.val);
+            if x == prev {
+                go(n.next, prev)
+            } else {
+                match n.next {
+                    Some(n2) if n2.val == n.val => go(Some(n2), x),
+                    _ => {
+                        n.next = go(n.next, x);
+                        Some(Box::new(*n))
+                    }
+                }
             }
+        } else {
+            None
         }
-        ln
-    })
+    }
+
+    go(head, None)
 }
 
 fn main() {
